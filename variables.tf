@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region to use"
   type        = string
-  default     = "us-west-1"
+  default     = "us-west-2"
 }
 
 variable "aws_access_key" {
@@ -30,14 +30,3 @@ variable "vpc_cidr" {
   }
 }
 
-variable "private_subnet" {
-  description = "The IPv4 CIDR block for private subnet"
-  type        = string
-  default     = "192.170.1.0/24"
-}
-
-variable "public_subnet" {
-  description = "The IPv4 CIDR block for public subnet"
-  type        = string
-  default     = "192.170.2.0/24"
-}

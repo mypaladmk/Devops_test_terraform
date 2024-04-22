@@ -37,21 +37,23 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "private_subnet" {
   vpc_id     = aws_vpc.main.id
   cidr_block = module.subnet_addrs.network_cidr_blocks["private"]
-  tags = {
-    Name = "private_subnet"
-  }
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "private_subnet"
+  })
+  availability_zone = var.aws_region
 
 }
 
 resource "aws_subnet" "public_subnet" {
   vpc_id     = aws_vpc.main.id
   cidr_block = module.subnet_addrs.network_cidr_blocks["public"]
-  tags = {
-    Name = "public_subnet"
-  }
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "public_subnet"
+  })
+  availability_zone = var.aws_region
 }
 
-resource "aws_internet_gateway" "test_igw" {
+resource "aws_internet_gateway" "public_igw" {
 
   vpc_id = aws_vpc.main.id
 
@@ -62,7 +64,7 @@ resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.test_igw.id
+    gateway_id = aws_internet_gateway.public_igw.id
   }
 
 }
@@ -77,9 +79,6 @@ resource "aws_route_table_association" "public_rt_association" {
 resource "aws_route_table" "private_rt" {
 
   vpc_id = aws_vpc.main.id
-  route {
-    cidr_block = var.vpc_cidr
-  }
 
 }
 
@@ -89,4 +88,26 @@ resource "aws_route_table_association" "private_rt_association" {
   route_table_id = aws_route_table.private_rt.id
 
 }
+
+resource "aws_eip" "elastic-ip-nat-gw" {
+
+  domain = "vpc"
+
+}
+
+resource "aws_nat_gateway" "nat-gw" {
+
+  allocation_id = aws_eip.elastic-ip-nat-gw.id
+  subnet_id     = aws_subnet.public_subnet.id
+
+  depends_on = [aws_eip.elastic-ip-nat-gw]
+
+}
+
+resource "aws_route" "nat-gw-route" {
+  route_table_id         = aws_route_table.private_rt.id
+  nat_gateway_id         = aws_nat_gateway.nat-gw.id
+  destination_cidr_block = aws_subnet.public_subnet.cidr_block
+}
+
 
