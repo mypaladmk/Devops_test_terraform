@@ -40,7 +40,7 @@ resource "aws_subnet" "private_subnet" {
   tags = merge(module.label_vpc.tags, {
     "Name" = "private_subnet"
   })
-  availability_zone = var.aws_region
+  availability_zone = var.aws_az
 
 }
 
@@ -50,7 +50,7 @@ resource "aws_subnet" "public_subnet" {
   tags = merge(module.label_vpc.tags, {
     "Name" = "public_subnet"
   })
-  availability_zone = var.aws_region
+  availability_zone = var.aws_az
 }
 
 resource "aws_internet_gateway" "public_igw" {
