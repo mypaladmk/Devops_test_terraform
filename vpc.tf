@@ -30,6 +30,10 @@ resource "aws_vpc" "main" {
   tags                 = module.label_vpc.tags
 }
 
+data "aws_availability_zone" "subnet_az" {
+  name = "us-west-1a"
+}
+
 # =========================
 # Create your subnets here
 # =========================
@@ -40,17 +44,18 @@ resource "aws_subnet" "private_subnet" {
   tags = merge(module.label_vpc.tags, {
     "Name" = "private_subnet"
   })
-  availability_zone = var.aws_az
+  availability_zone = data.aws_availability_zone.subnet_az
 
 }
 
 resource "aws_subnet" "public_subnet" {
   vpc_id     = aws_vpc.main.id
   cidr_block = module.subnet_addrs.network_cidr_blocks["public"]
+  map_public_ip_on_launch = true
   tags = merge(module.label_vpc.tags, {
     "Name" = "public_subnet"
   })
-  availability_zone = var.aws_az
+  availability_zone = data.aws_availability_zone.subnet_az
 }
 
 resource "aws_internet_gateway" "public_igw" {

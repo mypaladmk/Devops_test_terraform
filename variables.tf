@@ -4,12 +4,6 @@ variable "aws_region" {
   default     = "us-west-1"
 }
 
-variable "aws_az" {
-  description = "AWS region to use"
-  type        = string
-  default     = "us-west-1a"
-}
-
 variable "aws_access_key" {
   description = "AWS Access Key ID for the target AWS account"
   type        = string
