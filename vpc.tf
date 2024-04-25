@@ -49,8 +49,8 @@ resource "aws_subnet" "private_subnet" {
 }
 
 resource "aws_subnet" "public_subnet" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = module.subnet_addrs.network_cidr_blocks["public"]
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = module.subnet_addrs.network_cidr_blocks["public"]
   map_public_ip_on_launch = true
   tags = merge(module.label_vpc.tags, {
     "Name" = "public_subnet"
@@ -82,7 +82,7 @@ resource "aws_route_table_association" "public_rt_association" {
 
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
- 
+
 }
 
 resource "aws_route_table" "private_rt" {
@@ -125,7 +125,3 @@ resource "aws_route" "nat-gw-route" {
   destination_cidr_block = aws_subnet.public_subnet.cidr_block
 }
 
-
-locals {
-  name = "us-west-2a"
-}
