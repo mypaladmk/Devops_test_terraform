@@ -44,7 +44,7 @@ resource "aws_subnet" "private_subnet" {
   tags = merge(module.label_vpc.tags, {
     "Name" = "private_subnet"
   })
-  availability_zone = data.aws_availability_zone.subnet_az
+  availability_zone = data.aws_availability_zone.subnet_az.name
 
 }
 
@@ -55,13 +55,15 @@ resource "aws_subnet" "public_subnet" {
   tags = merge(module.label_vpc.tags, {
     "Name" = "public_subnet"
   })
-  availability_zone = data.aws_availability_zone.subnet_az
+  availability_zone = data.aws_availability_zone.subnet_az.name
 }
 
 resource "aws_internet_gateway" "public_igw" {
 
   vpc_id = aws_vpc.main.id
-
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "public_igw"
+  })
 }
 
 resource "aws_route_table" "public_rt" {
@@ -71,20 +73,24 @@ resource "aws_route_table" "public_rt" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.public_igw.id
   }
-
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "public_route_table"
+  })
 }
 
 resource "aws_route_table_association" "public_rt_association" {
 
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
-
+ 
 }
 
 resource "aws_route_table" "private_rt" {
 
   vpc_id = aws_vpc.main.id
-
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "private_route_table"
+  })
 }
 
 resource "aws_route_table_association" "private_rt_association" {
@@ -97,7 +103,9 @@ resource "aws_route_table_association" "private_rt_association" {
 resource "aws_eip" "elastic-ip-nat-gw" {
 
   domain = "vpc"
-
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "elastic-IP"
+  })
 }
 
 resource "aws_nat_gateway" "nat-gw" {
@@ -106,7 +114,9 @@ resource "aws_nat_gateway" "nat-gw" {
   subnet_id     = aws_subnet.public_subnet.id
 
   depends_on = [aws_eip.elastic-ip-nat-gw]
-
+  tags = merge(module.label_vpc.tags, {
+    "Name" = "Nat-Gateway"
+  })
 }
 
 resource "aws_route" "nat-gw-route" {
@@ -116,3 +126,6 @@ resource "aws_route" "nat-gw-route" {
 }
 
 
+locals {
+  name = "us-west-2a"
+}
