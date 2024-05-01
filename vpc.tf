@@ -31,7 +31,7 @@ resource "aws_vpc" "main" {
 }
 
 data "aws_availability_zone" "subnet_az" {
-  name = "us-west-1a"
+  name = "us-west-1b"
 }
 
 # =========================
